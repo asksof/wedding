@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ece9f0" />
+  <title>Тайминг Черногория</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ece9f0; --bg-card: #ffffff;
+      --ink: #2c2840; --ink-soft: #5e587a;
+      --accent: #5a6b8a; --accent-2: #b88aa0;
+      --line: #d8d3e0;
+      --shadow: 0 4px 24px rgba(40, 30, 60, 0.06);
+      --font-display: 'Cormorant Garamond', serif;
+      --radius: 14px;
+    }
+    body.theme-0 { --bg:#ece9f0; --bg-card:#ffffff; --ink:#2c2840; --ink-soft:#5e587a; --accent:#5a6b8a; --accent-2:#b88aa0; --line:#d8d3e0; --font-display:'Cormorant Garamond',serif; }
+    body.theme-1 { --bg:#f5ede0; --bg-card:#fffdf8; --ink:#2d2a1f; --ink-soft:#6b6253; --accent:#6b7f3a; --accent-2:#b8835a; --line:#e0d4bc; --font-display:'Cormorant Garamond',serif; }
+    body.theme-2 { --bg:#e8f1f5; --bg-card:#ffffff; --ink:#142b3d; --ink-soft:#4a6378; --accent:#1e5b78; --accent-2:#4a9eb0; --line:#c9dde6; --font-display:'Cormorant Garamond',serif; }
+    body.theme-3 { --bg:#fff5e6; --bg-card:#ffffff; --ink:#2a1f4e; --ink-soft:#6b5d8a; --accent:#ec3a5b; --accent-2:#f9b832; --line:#ffe2b3; --font-display:'Fredoka',sans-serif; }
+    /* Theme 4: FAQ — warm cream "guide book" with deep teal */
+    body.theme-4 { --bg:#f1e9d9; --bg-card:#fffcf4; --ink:#241c10; --ink-soft:#6b5b46; --accent:#1f5f5b; --accent-2:#b58446; --line:#e3d3b0; --font-display:'Cormorant Garamond',serif; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background-color: #ece9f0; transition: background-color 0.4s ease; }
+    html:has(body.theme-0) { background-color: #ece9f0; }
+    html:has(body.theme-1) { background-color: #f5ede0; }
+    html:has(body.theme-2) { background-color: #e8f1f5; }
+    html:has(body.theme-3) { background-color: #fff5e6; }
+    html:has(body.theme-4) { background-color: #f1e9d9; }
+    html, body {
+      background: var(--bg); color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 300; line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    body { min-height: 100vh; padding: 32px 20px 64px; position: relative; overflow-x: hidden; }
+    .container { max-width: 720px; margin: 0 auto; position: relative; z-index: 2; }
+
+    header { text-align: center; padding: 8px 0 32px; }
+    .ornament-top { display: flex; justify-content: center; margin-bottom: 14px; color: var(--accent); transition: color 0.4s ease; }
+    .ornament-top svg { display: block; max-width: 100%; height: auto; }
+    h1 {
+      font-family: var(--font-display); font-weight: 500;
+      font-size: clamp(32px, 7vw, 44px); letter-spacing: 0.5px;
+      margin-bottom: 8px; color: var(--ink);
+      transition: color 0.4s ease, font-family 0.2s;
+    }
+    .subtitle { color: var(--ink-soft); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+    .day-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 28px; flex-wrap: wrap; }
+    .day-tab {
+      background: rgba(255,255,255,0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      border: 1px solid var(--line); color: var(--ink-soft);
+      padding: 10px 18px; border-radius: 999px;
+      font-family: inherit; font-size: 14px; cursor: pointer;
+      transition: all 0.25s ease; white-space: nowrap;
+    }
+    .day-tab:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
+    .day-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .day { display: none; }
+    .day.active { display: block; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .day-decor { display: flex; justify-content: center; margin-bottom: 14px; color: var(--accent); }
+    .day-header { text-align: center; margin-bottom: 28px; }
+    .day-title { font-family: var(--font-display); font-size: 30px; font-weight: 500; margin-bottom: 6px; letter-spacing: 0.3px; }
+    body.theme-3 .day-title { font-weight: 600; letter-spacing: 0; }
+    .day-date { color: var(--ink-soft); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+    .timeline { position: relative; }
+    .event {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 18px 20px; margin-bottom: 12px; box-shadow: var(--shadow);
+      display: grid; grid-template-columns: 92px 1fr; gap: 16px; align-items: start;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .event:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(60,45,30,0.10); }
+    .event-time { font-family: var(--font-display); font-size: 20px; font-weight: 500; color: var(--accent); letter-spacing: 0.5px; padding-top: 2px; line-height: 1.2; }
+    body.theme-3 .event-time { font-weight: 600; }
+    .event-body { min-width: 0; }
+    .event-title { font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+    body.theme-3 .event-title { font-weight: 500; }
+    .event-desc { font-size: 14px; color: var(--ink-soft); line-height: 1.5; }
+    .event-note { display: block; margin-top: 6px; font-size: 12px; color: var(--accent); letter-spacing: 0.4px; }
+
+    .gift-card { margin-top: 28px; background: linear-gradient(135deg, #fff8eb 0%, #ffeed4 100%); border-radius: 22px; padding: 22px 20px 24px; box-shadow: 0 6px 24px rgba(236, 58, 91, 0.08); position: relative; overflow: hidden; }
+    .gift-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(249,184,50,0.22), transparent 70%); border-radius: 50%; }
+    .gift-card::after { content: ''; position: absolute; bottom: -40px; left: -30px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(236,58,91,0.16), transparent 70%); border-radius: 50%; }
+    .gift-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; position: relative; z-index: 1; }
+    .gift-icon { color: var(--accent); display: flex; }
+    .gift-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); }
+    .gift-section { position: relative; z-index: 1; }
+    .gift-section + .gift-section { margin-top: 18px; }
+    .gift-label { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; font-weight: 500; }
+    .gift-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { background: #fff; color: var(--ink); font-size: 13px; padding: 7px 13px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #fff; font-weight: 500; transition: transform 0.15s ease; }
+    .tag:hover { transform: translateY(-2px) scale(1.04); }
+    .tag.tag--yes-1 { background: #ffe5ec; color: #c2185b; }
+    .tag.tag--yes-2 { background: #fff4d4; color: #b88419; }
+    .tag.tag--yes-3 { background: #d8efff; color: #1e6fa8; }
+    .tag.tag--yes-4 { background: #d9f3dc; color: #2e7d32; }
+    .tag.tag--yes-5 { background: #ffe2cc; color: #c75b1d; }
+    .tag.tag--yes-6 { background: #ede1ff; color: #6a3eaa; }
+    .tag.tag--muted { background: transparent; color: var(--ink-soft); border: 1px dashed var(--ink-soft); box-shadow: none; text-decoration: line-through; text-decoration-color: rgba(107,93,138,0.45); opacity: 0.85; }
+
+    /* === FAQ — guidebook style === */
+    .faq-intro {
+      text-align: center;
+      max-width: 520px;
+      margin: 0 auto 28px;
+      padding: 0 8px;
+      color: var(--ink-soft);
+      font-style: italic;
+      font-family: var(--font-display);
+      font-size: 18px;
+      line-height: 1.5;
+    }
+    .faq-intro-orn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--accent-2);
+      opacity: 0.75;
+    }
+    .faq-intro-orn .line { flex: 0 0 60px; height: 1px; background: currentColor; }
+    .faq-intro-orn svg { display: block; }
+
+    .faq { display: flex; flex-direction: column; gap: 14px; }
+    .faq-item {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 12px rgba(50, 38, 18, 0.04);
+    }
+    .faq-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.35s ease;
+    }
+    .faq-item[open]::before { transform: scaleY(1); }
+    .faq-item[open] {
+      box-shadow: 0 8px 28px rgba(31, 95, 91, 0.12);
+      border-color: var(--accent);
+    }
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 22px 60px 22px 28px;
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      transition: background 0.2s ease;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary:hover { background: rgba(31, 95, 91, 0.04); }
+    .faq-item summary::after {
+      content: '';
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      width: 22px; height: 22px;
+      margin-top: -11px;
+      background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f5f5b' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='10' opacity='0.35'/%3E%3Cline x1='12' y1='8' x2='12' y2='16'/%3E%3Cline x1='8' y1='12' x2='16' y2='12'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-size: contain;
+      transition: transform 0.35s ease;
+      flex-shrink: 0;
+    }
+    .faq-item[open] summary::after { transform: rotate(135deg); }
+    .faq-num {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--accent-2);
+      flex-shrink: 0;
+      min-width: 36px;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+    .faq-q {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--ink);
+      flex: 1;
+      letter-spacing: 0.1px;
+    }
+    .faq-content {
+      padding: 4px 28px 26px 82px;
+      color: var(--ink-soft);
+      font-size: 14.5px;
+      line-height: 1.7;
+    }
+    .faq-content p { margin-bottom: 12px; }
+    .faq-content p:last-child { margin-bottom: 0; }
+    .faq-content strong { color: var(--ink); font-weight: 600; }
+
+    /* Contact rows (links inside FAQ) */
+    .contact-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .contact-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(31, 95, 91, 0.06);
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.18s ease;
+    }
+    .contact-row:hover { background: rgba(31, 95, 91, 0.12); border-color: var(--accent); transform: translateX(2px); }
+    .contact-row .ct-name { font-weight: 500; }
+    .contact-row .ct-val { color: var(--accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .contact-row .ct-icon { color: var(--accent); flex-shrink: 0; display: flex; }
+
+    /* Taxi service cards */
+    .tx-card {
+      background: rgba(181, 132, 70, 0.07);
+      border-left: 2px solid var(--accent-2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .tx-card .tx-name { font-weight: 600; color: var(--ink); margin-bottom: 6px; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .tx-phones { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tx-phone {
+      display: inline-block;
+      background: var(--bg-card);
+      color: var(--accent);
+      font-size: 13px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .tx-phone:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    @media (max-width: 480px) {
+      .faq-item summary { padding: 20px 50px 20px 20px; gap: 14px; }
+      .faq-num { font-size: 24px; min-width: 30px; }
+      .faq-q { font-size: 17px; }
+      .faq-content { padding: 4px 22px 22px 64px; }
+      .faq-intro { font-size: 16px; }
+    }
+
+    /* Place card (hotel info, copyable) */
+    .place-card {
+      margin-top: 28px;
+      background: var(--bg-card);
+      border-radius: 18px;
+      padding: 20px 20px 16px;
+      box-shadow: 0 6px 24px rgba(20, 43, 61, 0.08);
+      border: 1px solid var(--line);
+    }
+    .place-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .place-icon { color: var(--accent); display: flex; }
+    .place-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--ink); }
+    .copy-line {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; background: rgba(74, 158, 176, 0.08);
+      border: 1px solid transparent; color: var(--ink);
+      padding: 12px 14px; border-radius: 10px;
+      font-family: inherit; font-size: 14px; text-align: left;
+      cursor: pointer; transition: all 0.18s ease;
+      margin-bottom: 8px;
+    }
+    .copy-line:hover { background: rgba(74, 158, 176, 0.14); border-color: var(--accent-2); }
+    .copy-line:active { transform: scale(0.98); }
+    .copy-line.copied { background: rgba(102, 187, 106, 0.18); border-color: #66bb6a; }
+    .copy-line .label { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-soft); display: block; margin-bottom: 2px; }
+    .copy-line .value { font-weight: 500; }
+    .copy-line .icon { color: var(--accent); flex-shrink: 0; display: flex; }
+    .copy-line.copied .icon { color: #2e7d32; }
+    .copy-line .check { display: none; }
+    .copy-line.copied .check { display: flex; }
+    .copy-line.copied .copy { display: none; }
+    .map-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px; color: var(--accent);
+      text-decoration: none; font-size: 13px; letter-spacing: 0.3px;
+      border-bottom: 1px dashed var(--accent); padding-bottom: 1px;
+      transition: opacity 0.2s ease;
+    }
+    .map-link:hover { opacity: 0.75; }
+
+    footer { text-align: center; margin-top: 56px; color: var(--ink-soft); font-size: 13px; letter-spacing: 1px; position: relative; z-index: 2; }
+    .footer-decor { display: flex; justify-content: center; margin-bottom: 14px; color: var(--accent); opacity: 0.85; }
+    .footer-text { font-style: italic; font-family: var(--font-display); font-size: 16px; letter-spacing: 0.5px; margin-bottom: 4px; color: var(--ink-soft); }
+    .footer-names { font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--ink); letter-spacing: 1px; }
+
+    /* === Animated background — flattened, mobile-friendly === */
+    .bg-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      min-height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg-item {
+      position: absolute;
+      will-change: transform;
+      display: none;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    .bg-item svg { display: block; }
+    body.theme-0 .bg-item.t0,
+    body.theme-1 .bg-item.t1,
+    body.theme-2 .bg-item.t2,
+    body.theme-3 .bg-item.t3,
+    body.theme-4 .bg-item.t4 { display: block; }
+
+    /* === Keyframes === */
+    @keyframes drift-r {
+      0%   { transform: translate3d(-120px, 0, 0); }
+      100% { transform: translate3d(calc(100vw + 120px), 0, 0); }
+    }
+    @keyframes drift-l {
+      0%   { transform: translate3d(calc(100vw + 120px), 0, 0); }
+      100% { transform: translate3d(-120px, 0, 0); }
+    }
+    @keyframes float-up {
+      0%   { transform: translate3d(0, 100vh, 0) scale(0.7); opacity: 0; }
+      15%  { opacity: 0.55; }
+      85%  { opacity: 0.55; }
+      100% { transform: translate3d(0, -10vh, 0) scale(1.15); opacity: 0; }
+    }
+    @keyframes fall-spin {
+      0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+      100% { transform: translate3d(0, 110vh, 0) rotate(360deg); }
+    }
+    @keyframes fall {
+      0%   { transform: translate3d(0, -10vh, 0); }
+      100% { transform: translate3d(0, 110vh, 0); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.8); }
+      50%      { opacity: 1;    transform: scale(1.2); }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50%      { transform: translate3d(0, -16px, 0); }
+    }
+    @keyframes wave-shift {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+
+    .anim-drift-r-slow { animation: drift-r 55s linear infinite; }
+    .anim-drift-r-med  { animation: drift-r 36s linear infinite; }
+    .anim-drift-r-fast { animation: drift-r 22s linear infinite; }
+    .anim-drift-l-slow { animation: drift-l 65s linear infinite; }
+    .anim-drift-l-med  { animation: drift-l 42s linear infinite; }
+    .anim-floatup      { animation: float-up 28s linear infinite; }
+    .anim-floatup-slow { animation: float-up 42s linear infinite; }
+    .anim-fall         { animation: fall-spin 14s linear infinite; }
+    .anim-fall-slow    { animation: fall-spin 22s linear infinite; }
+    .anim-fall-plain   { animation: fall 16s linear infinite; }
+    .anim-twinkle      { animation: twinkle 3.5s ease-in-out infinite; }
+    .anim-bob          { animation: bob 4.5s ease-in-out infinite; }
+    .anim-wave-shift   { animation: wave-shift 14s linear infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bg-item, [class*="anim-"] { animation: none !important; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 20px 14px 48px; }
+      .event { grid-template-columns: 78px 1fr; padding: 16px; gap: 12px; }
+      .event-time { font-size: 18px; }
+      .day-tab { padding: 9px 14px; font-size: 13px; }
+      .day-title { font-size: 26px; }
+      .gift-card { padding: 20px 16px 22px; border-radius: 18px; }
+      .gift-title { font-size: 20px; }
+      .ornament-top svg, .day-decor svg { max-width: 100%; }
+    }
+  </style>
+</head>
+<body class="theme-0">
+
+  <!-- ===== Animated background ===== -->
+  <div class="bg-layer" id="bgLayer">
+
+    <!-- DAY 0: clouds, plane, stars -->
+    <div class="bg-item t0 anim-drift-r-slow" style="top:7%;"><svg width="84" height="36" viewBox="0 0 84 36"><ellipse cx="22" cy="22" rx="16" ry="8" fill="#fff" opacity="0.92"/><ellipse cx="44" cy="18" rx="22" ry="10" fill="#fff" opacity="0.92"/><ellipse cx="66" cy="22" rx="14" ry="7" fill="#fff" opacity="0.92"/></svg></div>
+    <div class="bg-item t0 anim-drift-l-slow" style="top:22%;"><svg width="64" height="28" viewBox="0 0 64 28"><ellipse cx="18" cy="18" rx="13" ry="6" fill="#fff" opacity="0.78"/><ellipse cx="34" cy="14" rx="16" ry="8" fill="#fff" opacity="0.78"/><ellipse cx="50" cy="18" rx="11" ry="5.5" fill="#fff" opacity="0.78"/></svg></div>
+    <div class="bg-item t0 anim-drift-r-med" style="top:38%;"><svg width="58" height="22" viewBox="0 0 58 22"><path d="M3,11 L26,8 L36,1 L41,1 L46,8 L56,11 L46,14 L41,21 L36,21 L26,14 Z" fill="#5a6b8a" opacity="0.7"/></svg></div>
+    <div class="bg-item t0 anim-drift-l-med" style="top:55%;"><svg width="76" height="32" viewBox="0 0 76 32"><ellipse cx="22" cy="20" rx="15" ry="7" fill="#fff" opacity="0.65"/><ellipse cx="42" cy="16" rx="20" ry="10" fill="#fff" opacity="0.65"/><ellipse cx="60" cy="20" rx="13" ry="6.5" fill="#fff" opacity="0.65"/></svg></div>
+    <div class="bg-item t0 anim-drift-r-slow" style="top:72%; animation-delay:-30s;"><svg width="60" height="26" viewBox="0 0 60 26"><ellipse cx="18" cy="16" rx="12" ry="6" fill="#fff" opacity="0.6"/><ellipse cx="34" cy="13" rx="15" ry="7.5" fill="#fff" opacity="0.6"/><ellipse cx="48" cy="16" rx="11" ry="5.5" fill="#fff" opacity="0.6"/></svg></div>
+    <div class="bg-item t0 anim-twinkle" style="top:12%; right:18%;"><svg width="11" height="11" viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="2.4" fill="#b88aa0"/></svg></div>
+    <div class="bg-item t0 anim-twinkle" style="top:30%; left:14%; animation-delay:1s;"><svg width="9" height="9" viewBox="0 0 9 9"><circle cx="4.5" cy="4.5" r="2" fill="#b88aa0"/></svg></div>
+    <div class="bg-item t0 anim-twinkle" style="top:18%; left:6%; animation-delay:1.8s;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.2" fill="#5a6b8a"/></svg></div>
+    <div class="bg-item t0 anim-twinkle" style="top:48%; right:8%; animation-delay:2.5s;"><svg width="11" height="11" viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="2.4" fill="#5a6b8a"/></svg></div>
+    <div class="bg-item t0 anim-twinkle" style="top:64%; right:22%; animation-delay:0.7s;"><svg width="9" height="9" viewBox="0 0 9 9"><circle cx="4.5" cy="4.5" r="1.8" fill="#b88aa0"/></svg></div>
+    <div class="bg-item t0 anim-twinkle" style="top:80%; left:12%; animation-delay:1.4s;"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2.2" fill="#5a6b8a"/></svg></div>
+
+    <!-- DAY 1: olive leaves falling + shells -->
+    <div class="bg-item t1 anim-fall-slow" style="left:6%;"><svg width="34" height="14" viewBox="0 0 34 14"><ellipse cx="17" cy="7" rx="15" ry="5" fill="#8aa052" opacity="0.7"/><line x1="2" y1="7" x2="32" y2="7" stroke="#3d5a1c" stroke-width="0.5" opacity="0.5"/></svg></div>
+    <div class="bg-item t1 anim-fall" style="left:22%; animation-delay:-4s;"><svg width="28" height="12" viewBox="0 0 28 12"><ellipse cx="14" cy="6" rx="13" ry="4" fill="#7a8e44" opacity="0.6"/></svg></div>
+    <div class="bg-item t1 anim-fall-slow" style="left:42%; animation-delay:-9s;"><svg width="34" height="14" viewBox="0 0 34 14"><ellipse cx="17" cy="7" rx="15" ry="5" fill="#8aa052" opacity="0.65"/><line x1="2" y1="7" x2="32" y2="7" stroke="#3d5a1c" stroke-width="0.5" opacity="0.5"/></svg></div>
+    <div class="bg-item t1 anim-fall" style="left:62%; animation-delay:-2s;"><svg width="30" height="13" viewBox="0 0 30 13"><ellipse cx="15" cy="6.5" rx="14" ry="4.5" fill="#8aa052" opacity="0.6"/></svg></div>
+    <div class="bg-item t1 anim-fall-slow" style="left:80%; animation-delay:-14s;"><svg width="32" height="13" viewBox="0 0 32 13"><ellipse cx="16" cy="6.5" rx="14" ry="4.5" fill="#7a8e44" opacity="0.6"/></svg></div>
+    <div class="bg-item t1 anim-fall" style="left:92%; animation-delay:-7s;"><svg width="28" height="12" viewBox="0 0 28 12"><ellipse cx="14" cy="6" rx="13" ry="4" fill="#8aa052" opacity="0.55"/></svg></div>
+    <!-- corner shells -->
+    <div class="bg-item t1 anim-bob" style="bottom:6%; left:4%;"><svg width="44" height="32" viewBox="0 0 44 32"><g transform="translate(22 24)"><path d="M-18,4 Q-22,-8 -16,-18 Q0,-24 16,-18 Q22,-8 18,4 Q16,6 -16,6 Q-18,6 -18,4 Z" fill="#ead6b6" opacity="0.85" stroke="#b8835a" stroke-width="0.6"/><line x1="-12" y1="4" x2="-9" y2="-18" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="-6" y1="5" x2="-4" y2="-19" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="0" y1="5" x2="0" y2="-20" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="6" y1="5" x2="4" y2="-19" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="12" y1="4" x2="9" y2="-18" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/></g></svg></div>
+    <div class="bg-item t1 anim-bob" style="bottom:14%; right:6%; animation-delay:-2s;"><svg width="40" height="30" viewBox="0 0 40 30"><g transform="translate(20 22)"><path d="M-16,4 Q-20,-7 -14,-16 Q0,-21 14,-16 Q20,-7 16,4 Q14,6 -14,6 Q-16,6 -16,4 Z" fill="#e8d5b8" opacity="0.8" stroke="#b8835a" stroke-width="0.5"/><line x1="-10" y1="4" x2="-7" y2="-16" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="-4" y1="5" x2="-2" y2="-17" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="2" y1="5" x2="2" y2="-18" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/><line x1="8" y1="4" x2="6" y2="-17" stroke="#b8835a" stroke-width="0.5" opacity="0.7"/></g></svg></div>
+    <div class="bg-item t1 anim-bob" style="top:48%; right:3%; animation-delay:-3s;"><svg width="32" height="24" viewBox="0 0 32 24"><g transform="translate(16 18)"><path d="M-13,3 Q-16,-6 -11,-13 Q0,-17 11,-13 Q16,-6 13,3 Q11,5 -11,5 Q-13,5 -13,3 Z" fill="#dfc9a5" opacity="0.7" stroke="#b8835a" stroke-width="0.4"/></g></svg></div>
+
+    <!-- DAY 2: bubbles + boat + waves bottom -->
+    <div class="bg-item t2 anim-floatup" style="left:10%;"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="none" stroke="#4a9eb0" stroke-width="1" opacity="0.55"/><circle cx="7" cy="7" r="2.2" fill="#fff" opacity="0.6"/></svg></div>
+    <div class="bg-item t2 anim-floatup-slow" style="left:32%; animation-delay:-12s;"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#4a9eb0" stroke-width="1" opacity="0.5"/><circle cx="6" cy="6" r="1.6" fill="#fff" opacity="0.55"/></svg></div>
+    <div class="bg-item t2 anim-floatup" style="left:58%; animation-delay:-20s;"><svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="#4a9eb0" stroke-width="1.2" opacity="0.5"/><circle cx="8" cy="8" r="2.4" fill="#fff" opacity="0.6"/></svg></div>
+    <div class="bg-item t2 anim-floatup-slow" style="left:84%; animation-delay:-30s;"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="#4a9eb0" stroke-width="1" opacity="0.5"/><circle cx="6.5" cy="6.5" r="2" fill="#fff" opacity="0.55"/></svg></div>
+    <!-- distant motor yacht (drifts horizontally) -->
+    <div class="bg-item t2 anim-drift-r-slow" style="top:20%;">
+      <svg width="60" height="34" viewBox="0 0 60 34">
+        <!-- hull -->
+        <path d="M5,22 Q4,22 5,26 L9,28 L51,28 L55,26 Q56,22 55,22 Z" fill="#1e5b78" opacity="0.85"/>
+        <line x1="6" y1="24" x2="54" y2="24" stroke="#4a9eb0" stroke-width="0.6" opacity="0.85"/>
+        <!-- cabin -->
+        <path d="M17,14 Q17,12 19,12 L37,12 Q39,12 41,15 L41,22 L17,22 Z" fill="#fff" stroke="#1e5b78" stroke-width="0.8" opacity="0.92"/>
+        <rect x="19" y="15" width="5" height="2.6" rx="0.4" fill="#4a9eb0" opacity="0.85"/>
+        <rect x="25.5" y="15" width="5" height="2.6" rx="0.4" fill="#4a9eb0" opacity="0.85"/>
+        <rect x="32" y="15" width="5.5" height="2.6" rx="0.4" fill="#4a9eb0" opacity="0.85"/>
+        <!-- flybridge -->
+        <path d="M24,8 Q24,6 26,6 L32,6 Q34,6 35,8 L35,12 L24,12 Z" fill="#fff" stroke="#1e5b78" stroke-width="0.7" opacity="0.92"/>
+        <!-- antenna -->
+        <line x1="29.5" y1="6" x2="29.5" y2="2" stroke="#1e5b78" stroke-width="0.7" stroke-linecap="round" opacity="0.9"/>
+        <circle cx="29.5" cy="1.6" r="0.9" fill="#ec3a5b" opacity="0.95"/>
+      </svg>
+    </div>
+    <!-- waves at bottom -->
+    <svg class="bg-item t2" style="left:0; bottom:0; width:100%; height:60px;" viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,30 Q100,10 200,30 T400,30 T600,30 T800,30 T1000,30 T1200,30 V60 H0 Z" fill="#4a9eb0" opacity="0.18"/>
+      <path d="M0,40 Q100,20 200,40 T400,40 T600,40 T800,40 T1000,40 T1200,40 V60 H0 Z" fill="#1e5b78" opacity="0.15"/>
+    </svg>
+
+    <!-- DAY 3: confetti + stars + balloons -->
+    <div class="bg-item t3 anim-fall" style="left:5%;"><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#ec3a5b"/></svg></div>
+    <div class="bg-item t3 anim-fall-slow" style="left:14%; animation-delay:-3s;"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="0" y="0" width="12" height="12" rx="2" fill="#f9b832"/></svg></div>
+    <div class="bg-item t3 anim-fall" style="left:24%; animation-delay:-6s;"><svg width="16" height="16" viewBox="0 0 16 16"><polygon points="8,1 10,6 15,6 11,9 13,14 8,11 3,14 5,9 1,6 6,6" fill="#42a5f5"/></svg></div>
+    <div class="bg-item t3 anim-fall-slow" style="left:36%; animation-delay:-9s;"><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#66bb6a"/></svg></div>
+    <div class="bg-item t3 anim-fall" style="left:48%; animation-delay:-2s;"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="0" y="0" width="12" height="12" rx="2" fill="#ec3a5b"/></svg></div>
+    <div class="bg-item t3 anim-fall-slow" style="left:58%; animation-delay:-11s;"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 9,5 13,5 10,8 11,13 7,10 3,13 4,8 1,5 5,5" fill="#f9b832"/></svg></div>
+    <div class="bg-item t3 anim-fall" style="left:70%; animation-delay:-5s;"><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#ab47bc"/></svg></div>
+    <div class="bg-item t3 anim-fall-slow" style="left:82%; animation-delay:-13s;"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="0" y="0" width="12" height="12" rx="2" fill="#42a5f5"/></svg></div>
+    <div class="bg-item t3 anim-fall" style="left:92%; animation-delay:-8s;"><svg width="16" height="16" viewBox="0 0 16 16"><polygon points="8,1 10,6 15,6 11,9 13,14 8,11 3,14 5,9 1,6 6,6" fill="#ec3a5b"/></svg></div>
+    <!-- twinkling stars -->
+    <div class="bg-item t3 anim-twinkle" style="top:14%; right:8%;"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 8.7,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.3,5" fill="#f9b832"/></svg></div>
+    <div class="bg-item t3 anim-twinkle" style="top:34%; left:6%; animation-delay:-1.2s;"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 7.4,4 11,4 8.2,6.5 9.4,10 6,8 2.6,10 3.8,6.5 1,4 4.6,4" fill="#ec3a5b"/></svg></div>
+    <div class="bg-item t3 anim-twinkle" style="top:60%; right:12%; animation-delay:-2.2s;"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 8.7,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.3,5" fill="#42a5f5"/></svg></div>
+    <div class="bg-item t3 anim-twinkle" style="top:80%; left:14%; animation-delay:-0.6s;"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 7.4,4 11,4 8.2,6.5 9.4,10 6,8 2.6,10 3.8,6.5 1,4 4.6,4" fill="#66bb6a"/></svg></div>
+    <!-- floating balloons (visible everywhere) -->
+    <div class="bg-item t3 anim-bob" style="top:12%; left:5%;"><svg width="34" height="54" viewBox="0 0 34 54"><ellipse cx="17" cy="18" rx="12" ry="16" fill="#ec3a5b" opacity="0.9"/><ellipse cx="14" cy="13" rx="1.8" ry="2.8" fill="#fff" opacity="0.55"/><path d="M17,33 L15.5,37 L18.5,37 Z" fill="#ec3a5b"/><path d="M17,37 Q15,46 18,54" stroke="#bbb" stroke-width="0.5" fill="none" opacity="0.6"/></svg></div>
+    <div class="bg-item t3 anim-bob" style="top:46%; right:4%; animation-delay:-1.5s;"><svg width="32" height="50" viewBox="0 0 32 50"><ellipse cx="16" cy="17" rx="11" ry="15" fill="#42a5f5" opacity="0.9"/><ellipse cx="13" cy="12" rx="1.8" ry="2.8" fill="#fff" opacity="0.55"/><path d="M16,31 L14.5,35 L17.5,35 Z" fill="#42a5f5"/><path d="M16,35 Q14,44 17,50" stroke="#bbb" stroke-width="0.5" fill="none" opacity="0.6"/></svg></div>
+    <div class="bg-item t3 anim-bob" style="bottom:18%; left:8%; animation-delay:-2.8s;"><svg width="30" height="46" viewBox="0 0 30 46"><ellipse cx="15" cy="16" rx="10" ry="14" fill="#f9b832" opacity="0.9"/><ellipse cx="12" cy="11" rx="1.6" ry="2.6" fill="#fff" opacity="0.55"/><path d="M15,29 L13.5,32 L16.5,32 Z" fill="#f9b832"/><path d="M15,32 Q13,40 16,46" stroke="#bbb" stroke-width="0.5" fill="none" opacity="0.6"/></svg></div>
+
+    <!-- DAY 4 (FAQ): keys, ornaments, diamonds — "guidebook" style -->
+    <!-- vintage keys, gently bobbing -->
+    <div class="bg-item t4 anim-bob" style="top:10%; left:5%;">
+      <svg width="42" height="18" viewBox="0 0 42 18" fill="none" stroke="#1f5f5b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.45">
+        <circle cx="6" cy="9" r="5"/><circle cx="6" cy="9" r="1.6" fill="#1f5f5b" stroke="none"/>
+        <line x1="11" y1="9" x2="38" y2="9"/>
+        <line x1="28" y1="9" x2="28" y2="13"/>
+        <line x1="33" y1="9" x2="33" y2="14"/>
+      </svg>
+    </div>
+    <div class="bg-item t4 anim-bob" style="top:48%; right:5%; animation-delay:-1.5s;">
+      <svg width="38" height="16" viewBox="0 0 42 18" fill="none" stroke="#b58446" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" transform="scale(-1 1) translate(-42 0)">
+        <circle cx="6" cy="9" r="5"/><circle cx="6" cy="9" r="1.6" fill="#b58446" stroke="none"/>
+        <line x1="11" y1="9" x2="38" y2="9"/>
+        <line x1="28" y1="9" x2="28" y2="13"/>
+        <line x1="33" y1="9" x2="33" y2="14"/>
+      </svg>
+    </div>
+    <div class="bg-item t4 anim-bob" style="bottom:14%; left:7%; animation-delay:-2.6s;">
+      <svg width="40" height="17" viewBox="0 0 42 18" fill="none" stroke="#1f5f5b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.4">
+        <circle cx="6" cy="9" r="5"/><circle cx="6" cy="9" r="1.6" fill="#1f5f5b" stroke="none"/>
+        <line x1="11" y1="9" x2="38" y2="9"/>
+        <line x1="28" y1="9" x2="28" y2="13"/>
+        <line x1="33" y1="9" x2="33" y2="14"/>
+      </svg>
+    </div>
+
+    <!-- Ornamental flourishes (curly swirls) -->
+    <div class="bg-item t4 anim-twinkle" style="top:18%; right:12%;">
+      <svg width="44" height="14" viewBox="0 0 44 14" fill="none" stroke="#b58446" stroke-width="1.1" stroke-linecap="round" opacity="0.55">
+        <path d="M2,7 Q10,2 14,7 Q18,12 22,7 Q26,2 30,7 Q34,12 42,7"/>
+      </svg>
+    </div>
+    <div class="bg-item t4 anim-twinkle" style="top:38%; left:8%; animation-delay:-1.2s;">
+      <svg width="40" height="12" viewBox="0 0 40 12" fill="none" stroke="#1f5f5b" stroke-width="1" stroke-linecap="round" opacity="0.5">
+        <path d="M2,6 Q8,2 12,6 Q16,10 20,6 Q24,2 28,6 Q32,10 38,6"/>
+      </svg>
+    </div>
+    <div class="bg-item t4 anim-twinkle" style="bottom:34%; right:8%; animation-delay:-2s;">
+      <svg width="44" height="14" viewBox="0 0 44 14" fill="none" stroke="#b58446" stroke-width="1.1" stroke-linecap="round" opacity="0.5">
+        <path d="M2,7 Q10,2 14,7 Q18,12 22,7 Q26,2 30,7 Q34,12 42,7"/>
+      </svg>
+    </div>
+
+    <!-- Diamond/dot ornaments (book-like markers) -->
+    <div class="bg-item t4 anim-twinkle" style="top:6%; left:30%;">
+      <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 13,7 7,13 1,7" fill="#b58446" opacity="0.6"/></svg>
+    </div>
+    <div class="bg-item t4 anim-twinkle" style="top:28%; left:42%; animation-delay:-1s;">
+      <svg width="10" height="10" viewBox="0 0 10 10"><polygon points="5,1 9,5 5,9 1,5" fill="#1f5f5b" opacity="0.5"/></svg>
+    </div>
+    <div class="bg-item t4 anim-twinkle" style="top:62%; left:50%; animation-delay:-2.4s;">
+      <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,6 6,11 1,6" fill="#b58446" opacity="0.5"/></svg>
+    </div>
+    <div class="bg-item t4 anim-twinkle" style="bottom:6%; right:30%; animation-delay:-0.6s;">
+      <svg width="10" height="10" viewBox="0 0 10 10"><polygon points="5,1 9,5 5,9 1,5" fill="#1f5f5b" opacity="0.5"/></svg>
+    </div>
+
+    <!-- Tiny laurel sprigs in corners -->
+    <div class="bg-item t4 anim-bob" style="top:24%; left:24%; animation-delay:-2s;">
+      <svg width="22" height="10" viewBox="0 0 22 10"><line x1="1" y1="5" x2="21" y2="5" stroke="#1f5f5b" stroke-width="0.7" opacity="0.5"/><ellipse cx="6" cy="3" rx="3" ry="1.4" fill="#1f5f5b" opacity="0.45" transform="rotate(-25 6 3)"/><ellipse cx="11" cy="7" rx="3" ry="1.4" fill="#1f5f5b" opacity="0.45" transform="rotate(25 11 7)"/><ellipse cx="16" cy="3" rx="3" ry="1.4" fill="#1f5f5b" opacity="0.45" transform="rotate(-25 16 3)"/></svg>
+    </div>
+    <div class="bg-item t4 anim-bob" style="top:78%; right:18%; animation-delay:-1s;">
+      <svg width="22" height="10" viewBox="0 0 22 10"><line x1="1" y1="5" x2="21" y2="5" stroke="#b58446" stroke-width="0.7" opacity="0.5"/><ellipse cx="6" cy="7" rx="3" ry="1.4" fill="#b58446" opacity="0.45" transform="rotate(25 6 7)"/><ellipse cx="11" cy="3" rx="3" ry="1.4" fill="#b58446" opacity="0.45" transform="rotate(-25 11 3)"/><ellipse cx="16" cy="7" rx="3" ry="1.4" fill="#b58446" opacity="0.45" transform="rotate(25 16 7)"/></svg>
+    </div>
+
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="ornament-top">
+        <svg width="60" height="14" viewBox="0 0 60 14"><circle cx="10" cy="7" r="2.2" fill="currentColor" opacity="0.6"/><circle cx="30" cy="7" r="2.6" fill="currentColor"/><circle cx="50" cy="7" r="2.2" fill="currentColor" opacity="0.6"/></svg>
+      </div>
+      <h1>Тайминг Черногория</h1>
+      <div class="subtitle">27 — 30 мая</div>
+    </header>
+
+    <nav class="day-tabs" id="dayTabs">
+      <button class="day-tab active" data-day="0">27 мая · Заезд</button>
+      <button class="day-tab" data-day="1">28 мая · Свадьба</button>
+      <button class="day-tab" data-day="2">29 мая · Будва</button>
+      <button class="day-tab" data-day="3">30 мая · Миша</button>
+      <button class="day-tab" data-day="4">Вопросы</button>
+    </nav>
+
+    <!-- DAY 0 — Arrival -->
+    <section class="day active" data-day="0">
+      <div class="day-decor">
+        <svg viewBox="0 0 280 70" width="280" height="70" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14,46 Q70,36 132,32" stroke="currentColor" stroke-width="0.9" fill="none" opacity="0.45" stroke-dasharray="3,4" stroke-linecap="round"/>
+          <path d="M148,32 Q210,36 266,46" stroke="currentColor" stroke-width="0.9" fill="none" opacity="0.45" stroke-dasharray="3,4" stroke-linecap="round"/>
+          <g transform="translate(140 30) rotate(-15)" fill="currentColor"><path d="M-30,0 L-12,-3 L-6,-15 L0,-15 L6,-3 L30,0 L6,3 L0,15 L-6,15 L-12,3 Z"/></g>
+          <g transform="translate(46 46)" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="-9" y="-6" width="18" height="14" rx="2" fill="currentColor" opacity="0.12" stroke-width="1.2"/><path d="M-4,-6 V-10 H4 V-6" stroke-width="1.2"/><line x1="-9" y1="0" x2="9" y2="0" stroke-width="1.1"/><circle cx="-5" cy="-2" r="0.8" fill="currentColor"/></g>
+          <g transform="translate(234 46)" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="-9" y="-6" width="18" height="14" rx="2" fill="currentColor" opacity="0.12" stroke-width="1.2"/><path d="M-4,-6 V-10 H4 V-6" stroke-width="1.2"/><line x1="-9" y1="0" x2="9" y2="0" stroke-width="1.1"/><circle cx="-5" cy="-2" r="0.8" fill="currentColor"/></g>
+          <g fill="currentColor" opacity="0.2"><ellipse cx="92" cy="20" rx="9" ry="3"/><ellipse cx="100" cy="18" rx="6" ry="2.4"/><ellipse cx="188" cy="22" rx="9" ry="3"/><ellipse cx="180" cy="20" rx="6" ry="2.4"/></g>
+        </svg>
+      </div>
+      <div class="day-header">
+        <div class="day-title">Заезд</div>
+        <div class="day-date">27 мая, среда</div>
+      </div>
+      <div class="timeline">
+        <div class="event"><div class="event-time">в течение<br>дня</div><div class="event-body"><div class="event-title">Дорога и перелёты</div><div class="event-desc">Гости добираются до отеля своим ходом</div></div></div>
+        <div class="event"><div class="event-time">18:30<br>—<br>21:00</div><div class="event-body"><div class="event-title">Ужин</div></div></div>
+      </div>
+    </section>
+
+    <!-- DAY 1 — Wedding -->
+    <section class="day" data-day="1">
+      <div class="day-decor">
+        <svg viewBox="0 0 280 56" width="280" height="56" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#7a8e44" stroke-width="1" fill="none" stroke-linecap="round"><path d="M8,28 Q60,26 110,28"/></g>
+          <g fill="#8aa052"><ellipse cx="22" cy="22" rx="6.5" ry="2.6" transform="rotate(-28 22 22)"/><ellipse cx="38" cy="34" rx="6.5" ry="2.6" transform="rotate(28 38 34)"/><ellipse cx="54" cy="22" rx="7" ry="2.8" transform="rotate(-32 54 22)"/><ellipse cx="70" cy="34" rx="7" ry="2.8" transform="rotate(32 70 34)"/><ellipse cx="86" cy="22" rx="6.5" ry="2.6" transform="rotate(-28 86 22)"/><ellipse cx="102" cy="33" rx="6" ry="2.4" transform="rotate(28 102 33)"/></g>
+          <g fill="#3d5a1c"><circle cx="32" cy="28" r="2.2"/><circle cx="64" cy="28" r="2.6"/><circle cx="96" cy="28" r="2.2"/></g>
+          <g transform="translate(140 30)"><path d="M-16,9 Q-22,-4 -14,-12 Q0,-16 14,-12 Q22,-4 16,9 Q14,11 -14,11 Q-16,11 -16,9 Z" fill="#ead6b6" stroke="#b8835a" stroke-width="0.7"/><line x1="-12" y1="9" x2="-9" y2="-12" stroke="#b8835a" stroke-width="0.6"/><line x1="-7" y1="10" x2="-5" y2="-13" stroke="#b8835a" stroke-width="0.6"/><line x1="-2" y1="10" x2="-1" y2="-14" stroke="#b8835a" stroke-width="0.6"/><line x1="3" y1="10" x2="2" y2="-14" stroke="#b8835a" stroke-width="0.6"/><line x1="8" y1="10" x2="6" y2="-13" stroke="#b8835a" stroke-width="0.6"/><line x1="13" y1="9" x2="10" y2="-12" stroke="#b8835a" stroke-width="0.6"/><ellipse cx="0" cy="-13" rx="3" ry="2" fill="#b8835a"/></g>
+          <g stroke="#7a8e44" stroke-width="1" fill="none" stroke-linecap="round"><path d="M170,28 Q220,30 272,28"/></g>
+          <g fill="#8aa052"><ellipse cx="178" cy="33" rx="6" ry="2.4" transform="rotate(-28 178 33)"/><ellipse cx="194" cy="22" rx="6.5" ry="2.6" transform="rotate(28 194 22)"/><ellipse cx="210" cy="34" rx="7" ry="2.8" transform="rotate(-32 210 34)"/><ellipse cx="226" cy="22" rx="7" ry="2.8" transform="rotate(32 226 22)"/><ellipse cx="242" cy="34" rx="6.5" ry="2.6" transform="rotate(-28 242 34)"/><ellipse cx="258" cy="22" rx="6.5" ry="2.6" transform="rotate(28 258 22)"/></g>
+          <g fill="#3d5a1c"><circle cx="184" cy="28" r="2.2"/><circle cx="216" cy="28" r="2.6"/><circle cx="250" cy="28" r="2.2"/></g>
+        </svg>
+      </div>
+      <div class="day-header">
+        <div class="day-title">Свадебный день</div>
+        <div class="day-date">28 мая, четверг</div>
+      </div>
+      <div class="timeline">
+        <div class="event"><div class="event-time">08:00<br>—<br>11:00</div><div class="event-body"><div class="event-title">Завтрак в отеле</div></div></div>
+        <div class="event"><div class="event-time">11:00<br>—<br>16:00</div><div class="event-body"><div class="event-title">Свободное время</div><div class="event-desc">Рекомендуем вам покупаться в бассейне до 13:00, спуститься к морю или просто отдохнуть в отеле</div></div></div>
+        <div class="event"><div class="event-time">14:00</div><div class="event-body"><div class="event-title">Обед на ресепшене</div><div class="event-desc">На каждого гостя приготовлен обед — его можно подойти и забрать на ресепшене, удобно унести с собой в номер</div></div></div>
+        <div class="event"><div class="event-time">16:00</div><div class="event-body"><div class="event-title">Сбор на втором этаже террасы отеля</div></div></div>
+        <div class="event"><div class="event-time">16:30<br>—<br>17:30</div><div class="event-body"><div class="event-title">Выездная регистрация</div><div class="event-desc">Пройдёт на территории отеля — на террасе второго этажа. От идеи с оливковой рощей, к сожалению, пришлось отказаться: по техническим причинам она оказалась нереализуемой.</div></div></div>
+        <div class="event"><div class="event-time">18:00</div><div class="event-body"><div class="event-title">Начало банкета</div></div></div>
+        <div class="event"><div class="event-time">22:00</div><div class="event-body"><div class="event-title">Вынос свадебного торта</div></div></div>
+        <div class="event"><div class="event-time">00:00<br>—<br>01:00</div><div class="event-body"><div class="event-title">Совместное караоке и завершение вечера</div></div></div>
+      </div>
+    </section>
+
+    <!-- DAY 2 — Yacht & sea -->
+    <section class="day" data-day="2">
+      <div class="day-decor">
+        <svg viewBox="0 0 280 60" width="280" height="60" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 Q20,30 40,40 T80,40 T120,40 T160,40 T200,40 T240,40 T280,40" stroke="#1e5b78" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M0,50 Q20,40 40,50 T80,50 T120,50 T160,50 T200,50 T240,50 T280,50" stroke="#4a9eb0" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.65"/>
+          <g transform="translate(140 18)"><ellipse cx="0" cy="22" rx="28" ry="2" fill="#1e5b78" opacity="0.15"/><path d="M-26,14 Q-28,14 -26,18 L-22,20 L22,20 L26,18 Q28,14 26,14 Z" fill="#1e5b78"/><line x1="-24" y1="16.5" x2="24" y2="16.5" stroke="#4a9eb0" stroke-width="0.7" opacity="0.9"/><path d="M-12,7 Q-12,5 -10,5 L8,5 Q10,5 13,8 L13,14 L-12,14 Z" fill="#fff" stroke="#1e5b78" stroke-width="0.9"/><rect x="-10" y="8" width="5.5" height="3" rx="0.4" fill="#4a9eb0" opacity="0.85"/><rect x="-2.5" y="8" width="5.5" height="3" rx="0.4" fill="#4a9eb0" opacity="0.85"/><rect x="5" y="8" width="6" height="3" rx="0.4" fill="#4a9eb0" opacity="0.85"/><path d="M-5,1 Q-5,-1 -3,-1 L3,-1 Q5,-1 6,1 L6,5 L-5,5 Z" fill="#fff" stroke="#1e5b78" stroke-width="0.8"/><line x1="0" y1="-1" x2="0" y2="-6" stroke="#1e5b78" stroke-width="0.8" stroke-linecap="round"/><circle cx="0" cy="-6.5" r="1" fill="#ec3a5b"/></g>
+          <g transform="translate(56 24)" stroke="#1e5b78" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-9" r="2.3"/><line x1="0" y1="-7" x2="0" y2="9"/><line x1="-5" y1="-3" x2="5" y2="-3"/><path d="M-7,5 Q-6,10 0,11 Q6,10 7,5"/></g>
+          <g transform="translate(224 24)" stroke="#1e5b78" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-9" r="2.3"/><line x1="0" y1="-7" x2="0" y2="9"/><line x1="-5" y1="-3" x2="5" y2="-3"/><path d="M-7,5 Q-6,10 0,11 Q6,10 7,5"/></g>
+        </svg>
+      </div>
+      <div class="day-header">
+        <div class="day-title">Будва</div>
+        <div class="day-date">29 мая, пятница</div>
+      </div>
+      <div class="timeline">
+        <div class="event"><div class="event-time">08:00<br>—<br>11:00</div><div class="event-body"><div class="event-title">Завтрак в отеле</div></div></div>
+        <div class="event"><div class="event-time">12:00</div><div class="event-body"><div class="event-title">Сбор у ресепшена с вещами и отправление в Будву</div><div class="event-desc">Дорога займёт примерно 1 час</div></div></div>
+        <div class="event"><div class="event-time">12:50</div><div class="event-body"><div class="event-title">Остановка в торговом центре</div><div class="event-desc">Для тех, кто хочет выйти — например, купить игрушку или по другим делам. Дальше до отеля своим ходом на такси (10–15 минут).</div></div></div>
+        <div class="event"><div class="event-time">13:10</div><div class="event-body"><div class="event-title">Конечная остановка в отеле</div></div></div>
+        <div class="event"><div class="event-time">14:00</div><div class="event-body"><div class="event-title">Заселение в отель в Будве</div></div></div>
+        <div class="event"><div class="event-time">17:00</div><div class="event-body"><div class="event-title">Сбор на ресепшене для поездки на лодке</div></div></div>
+        <div class="event"><div class="event-time">17:50</div><div class="event-body"><div class="event-title">Встреча у Pasta Bar возле порта</div><div class="event-desc">Все желающие могут купить себе пасту навынос и взять с собой на лодку — обязательно попробуйте, её очень хвалят</div></div></div>
+        <div class="event"><div class="event-time">18:30<br>—<br>20:30</div><div class="event-body"><div class="event-title">Прогулка на лодке</div><div class="event-desc">Возьмите с собой верхнюю одежду — на воде ощутимо прохладнее</div></div></div>
+        <div class="event"><div class="event-time">20:30</div><div class="event-body"><div class="event-title">После прогулки — на ваш выбор</div><div class="event-desc">Можно вернуться в отель и отдохнуть либо остаться поужинать в ресторане возле порта</div></div></div>
+      </div>
+
+      <div class="place-card">
+        <div class="place-header">
+          <div class="place-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+          </div>
+          <div class="place-title">Конечная точка</div>
+        </div>
+        <button class="copy-line" type="button" data-copy="Eurostars Queen of Montenegro">
+          <span><span class="label">Отель</span><span class="value">Eurostars Queen of Montenegro</span></span>
+          <span class="icon">
+            <svg class="copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </button>
+        <button class="copy-line" type="button" data-copy="Narodnog Fronta, 85315 Bečići">
+          <span><span class="label">Адрес</span><span class="value">Narodnog Fronta, 85315 Bečići</span></span>
+          <span class="icon">
+            <svg class="copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </button>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Eurostars+Queen+of+Montenegro+Becici" target="_blank" rel="noopener">
+          Открыть на карте
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="8 7 17 7 17 16"/></svg>
+        </a>
+      </div>
+
+      <div class="place-card">
+        <div class="place-header">
+          <div class="place-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="5" r="3"/>
+              <line x1="12" y1="22" x2="12" y2="8"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+              <path d="M5 12a7 7 0 0 0 14 0"/>
+            </svg>
+          </div>
+          <div class="place-title">Порт</div>
+        </div>
+        <button class="copy-line" type="button" data-copy="Marina Budva">
+          <span><span class="label">Название</span><span class="value">Marina Budva — у Старого города</span></span>
+          <span class="icon">
+            <svg class="copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </button>
+        <button class="copy-line" type="button" data-copy="85310 Budva, Montenegro (Budva Old Town)">
+          <span><span class="label">Адрес</span><span class="value">85310 Будва, Черногория (Budva Old Town)</span></span>
+          <span class="icon">
+            <svg class="copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </button>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Marina+Budva" target="_blank" rel="noopener">
+          Открыть на карте
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="8 7 17 7 17 16"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- DAY 3 — Birthday -->
+    <section class="day" data-day="3">
+      <div class="day-decor">
+        <svg viewBox="0 0 280 90" width="280" height="90" xmlns="http://www.w3.org/2000/svg">
+          <g><ellipse cx="50" cy="32" rx="14" ry="18" fill="#ec3a5b"/><ellipse cx="46" cy="26" rx="2" ry="3.2" fill="#fff" opacity="0.55"/><path d="M50,50 L48,55 L52,55 Z" fill="#ec3a5b"/><path d="M50,55 Q48,68 52,86" stroke="#bbb" stroke-width="0.6" fill="none"/></g>
+          <g><ellipse cx="100" cy="40" rx="14" ry="18" fill="#f9b832"/><ellipse cx="96" cy="34" rx="2" ry="3.2" fill="#fff" opacity="0.55"/><path d="M100,58 L98,63 L102,63 Z" fill="#f9b832"/><path d="M100,63 Q102,74 98,86" stroke="#bbb" stroke-width="0.6" fill="none"/></g>
+          <g><ellipse cx="155" cy="28" rx="14" ry="18" fill="#42a5f5"/><ellipse cx="151" cy="22" rx="2" ry="3.2" fill="#fff" opacity="0.55"/><path d="M155,46 L153,51 L157,51 Z" fill="#42a5f5"/><path d="M155,51 Q153,64 157,86" stroke="#bbb" stroke-width="0.6" fill="none"/></g>
+          <g><ellipse cx="205" cy="40" rx="14" ry="18" fill="#66bb6a"/><ellipse cx="201" cy="34" rx="2" ry="3.2" fill="#fff" opacity="0.55"/><path d="M205,58 L203,63 L207,63 Z" fill="#66bb6a"/><path d="M205,63 Q207,74 203,86" stroke="#bbb" stroke-width="0.6" fill="none"/></g>
+          <g><ellipse cx="252" cy="34" rx="13" ry="17" fill="#ab47bc"/><ellipse cx="248" cy="28" rx="1.8" ry="3" fill="#fff" opacity="0.55"/><path d="M252,51 L250,55 L254,55 Z" fill="#ab47bc"/><path d="M252,55 Q250,68 254,86" stroke="#bbb" stroke-width="0.6" fill="none"/></g>
+        </svg>
+      </div>
+      <div class="day-header">
+        <div class="day-title">День рождения Миши</div>
+        <div class="day-date">30 мая, суббота</div>
+      </div>
+      <div class="timeline">
+        <div class="event"><div class="event-time">08:00<br>—<br>11:00</div><div class="event-body"><div class="event-title">Завтрак в отеле</div></div></div>
+        <div class="event"><div class="event-time">11:00<br>—<br>18:00</div><div class="event-body"><div class="event-title">Свободное время</div><div class="event-desc">Отдых, прогулка, бассейн или спа</div></div></div>
+        <div class="event"><div class="event-time">17:00</div><div class="event-body"><div class="event-title">Приходите в костюме и с подарком в номер</div><span class="event-note">Номер уточним позже — здесь появится информация</span></div></div>
+        <div class="event"><div class="event-time">17:30</div><div class="event-body"><div class="event-title">Начало праздника</div></div></div>
+        <div class="event"><div class="event-time">20:00</div><div class="event-body"><div class="event-title">Торт</div></div></div>
+        <div class="event"><div class="event-time">22:00</div><div class="event-body"><div class="event-title">Завершение</div></div></div>
+      </div>
+
+      <div class="gift-card">
+        <div class="gift-header">
+          <div class="gift-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="9" width="18" height="11" rx="1.2"/>
+              <rect x="2" y="6" width="20" height="3.5" rx="0.6"/>
+              <path d="M12 6 V20"/>
+              <path d="M12 6 C12 3, 8 2.5, 8 5 C8 5.7, 9 6, 12 6 Z"/>
+              <path d="M12 6 C12 3, 16 2.5, 16 5 C16 5.7, 15 6, 12 6 Z"/>
+            </svg>
+          </div>
+          <div class="gift-title">Идеи для подарка</div>
+        </div>
+        <div class="gift-section">
+          <div class="gift-label">Что точно понравится Мише</div>
+          <div class="gift-tags">
+            <span class="tag tag--yes-1">Тачки</span>
+            <span class="tag tag--yes-2">Корпорация монстров</span>
+            <span class="tag tag--yes-3">Миньоны</span>
+            <span class="tag tag--yes-4">Как приручить дракона</span>
+            <span class="tag tag--yes-5">Человек-паук</span>
+            <span class="tag tag--yes-4">Соник</span>
+            <span class="tag tag--yes-3">Вспыш</span>
+            <span class="tag tag--yes-2">Раскраски</span>
+            <span class="tag tag--yes-6">Рукоделие для мальчиков</span>
+            <span class="tag tag--yes-4">Развивающие игры и задания</span>
+          </div>
+        </div>
+        <div class="gift-section">
+          <div class="gift-label">Лучше не дарить</div>
+          <div class="gift-tags">
+            <span class="tag tag--muted">Конструкторы</span>
+            <span class="tag tag--muted">Куклы</span>
+            <span class="tag tag--muted">Маленькие фигурки</span>
+            <span class="tag tag--muted">Динозавры</span>
+            <span class="tag tag--muted">Роботы</span>
+            <span class="tag tag--muted">Самолёты</span>
+            <span class="tag tag--muted">Паровозики</span>
+            <span class="tag tag--muted">Малышковые/милые герои</span>
+            <span class="tag tag--muted">Одежда</span>
+            <span class="tag tag--muted">Книги</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAY 4 — FAQ (Guidebook style) -->
+    <section class="day" data-day="4">
+      <div class="day-decor">
+        <svg viewBox="0 0 280 60" width="280" height="60" xmlns="http://www.w3.org/2000/svg">
+          <!-- left flourish -->
+          <g stroke="#b58446" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.85">
+            <path d="M14,30 Q40,30 60,30"/>
+            <path d="M60,30 Q66,30 70,26 Q74,22 78,26 Q82,30 86,30"/>
+            <circle cx="98" cy="30" r="1.6" fill="#b58446" stroke="none"/>
+          </g>
+          <!-- center key emblem with frame -->
+          <g transform="translate(140 30)">
+            <circle cx="0" cy="0" r="20" fill="#fffcf4" stroke="#1f5f5b" stroke-width="1.2"/>
+            <circle cx="0" cy="0" r="16" fill="none" stroke="#b58446" stroke-width="0.6" stroke-dasharray="2,3" opacity="0.7"/>
+            <!-- vintage key -->
+            <g stroke="#1f5f5b" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="-7" cy="0" r="4.5"/>
+              <circle cx="-7" cy="0" r="1.6" fill="#1f5f5b" stroke="none"/>
+              <line x1="-2.5" y1="0" x2="11" y2="0"/>
+              <line x1="5" y1="0" x2="5" y2="4"/>
+              <line x1="9" y1="0" x2="9" y2="5"/>
+            </g>
+          </g>
+          <!-- right flourish (mirror) -->
+          <g stroke="#b58446" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.85">
+            <path d="M266,30 Q240,30 220,30"/>
+            <path d="M220,30 Q214,30 210,34 Q206,38 202,34 Q198,30 194,30"/>
+            <circle cx="182" cy="30" r="1.6" fill="#b58446" stroke="none"/>
+          </g>
+        </svg>
+      </div>
+      <div class="day-header">
+        <div class="day-title">Гид для гостей</div>
+        <div class="day-date">Частые вопросы</div>
+      </div>
+
+      <div class="faq-intro">
+        <div class="faq-intro-orn">
+          <span class="line"></span>
+          <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 13,7 7,13 1,7" fill="currentColor"/></svg>
+          <span class="line"></span>
+        </div>
+        Если что-то осталось непонятным — здесь собрано всё, о чём чаще всего спрашивают
+      </div>
+
+      <div class="faq">
+        <details class="faq-item">
+          <summary><span class="faq-num">I</span><span class="faq-q">Что включено в отеле в Будве?</span></summary>
+          <div class="faq-content">
+            <p>В отеле в Будве включены <strong>завтрак и спа</strong>. Всё остальное — обеды, ужины, напитки, личные покупки и дополнительные расходы — оплачивается самостоятельно.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-num">II</span><span class="faq-q">Что с обедом и ужином 29 и 30 мая?</span></summary>
+          <div class="faq-content">
+            <p>29 и 30 мая для гостей включён только завтрак. Обед и ужин каждый планирует самостоятельно: можно поесть в отеле, выбрать ресторан рядом, съездить в город или провести день в своём темпе.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-num">III</span><span class="faq-q">Можно ли свободно гулять в свободное время?</span></summary>
+          <div class="faq-content">
+            <p>Да, конечно. Всё время, которое не указано в тайминге, остаётся свободным. Вы можете гулять, отдыхать в отеле, ездить по Черногории, проводить время у моря или строить свои планы так, как вам удобно.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-num">IV</span><span class="faq-q">Что будет с едой на дне рождения Миши?</span></summary>
+          <div class="faq-content">
+            <p>На день рождения Миши будет заказана еда и торт. Если вы хотите принести что-то от себя — угощение, блюдо или что-то к общему столу — это будет уместно.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-num">V</span><span class="faq-q">Как вызвать такси в Черногории?</span></summary>
+          <div class="faq-content">
+            <p>В Черногории нет привычного Uber, поэтому удобнее заранее скачать приложение <strong>MonteGO</strong> — там есть русский язык, можно указать адрес, увидеть примерную стоимость и вызвать машину.</p>
+            <p>Также можно обратиться в местные службы такси:</p>
+            <div class="tx-card">
+              <div class="tx-name">Red Taxi</div>
+              <div class="tx-phones">
+                <a class="tx-phone" href="tel:+38267019729">+382 67 019 729</a>
+                <a class="tx-phone" href="tel:+38267254800">+382 67 254 800</a>
+              </div>
+            </div>
+            <div class="tx-card">
+              <div class="tx-name">Golub Taxi</div>
+              <div class="tx-phones">
+                <a class="tx-phone" href="tel:+38267349588">+382 67 349 588</a>
+              </div>
+            </div>
+            <div class="tx-card">
+              <div class="tx-name">Halo Taxi</div>
+              <div class="tx-phones">
+                <a class="tx-phone" href="tel:+38268029565">+382 68 029 565</a>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-num">VI</span><span class="faq-q">К кому обращаться 27 и 28 мая?</span></summary>
+          <div class="faq-content">
+            <p>27 и 28 мая по вопросам организации, тайминга, логистики и текущих моментов можно обращаться к организатору <strong>Дарье</strong>:</p>
+            <div class="contact-list">
+              <a class="contact-row" href="https://wa.me/38267480160" target="_blank" rel="noopener">
+                <span><span class="ct-name">WhatsApp</span> · <span class="ct-val">+382 67 480 160</span></span>
+                <span class="ct-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.2-.5.1-.2 0-.4 0-.5L9 7.4c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4-.2.3-.9.9-.9 2.2 0 1.3.9 2.5 1 2.7.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.4.5.6.2 1.1.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.3-.2-.6-.3z"/><path d="M20.5 3.5C18.3 1.2 15.3 0 12 0 5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6c1.7.9 3.7 1.4 5.7 1.4h.1c6.6 0 12-5.4 12-12 0-3.2-1.3-6.2-3.5-8.3zM12 21.8c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.6.9.9-3.5-.2-.4c-1-1.6-1.5-3.5-1.5-5.4C2 6.5 6.5 2 12 2c2.7 0 5.2 1 7.1 2.9 1.9 1.9 2.9 4.4 2.9 7.1 0 5.5-4.5 9.8-10 9.8z"/></svg></span>
+              </a>
+              <a class="contact-row" href="https://t.me/DaryaSinica" target="_blank" rel="noopener">
+                <span><span class="ct-name">Telegram</span> · <span class="ct-val">@DaryaSinica</span></span>
+                <span class="ct-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.5 8.2-1.8 8.6c-.1.6-.5.8-1.1.5l-3-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3.1 5.6-5c.2-.2 0-.3-.3-.1l-6.9 4.3-3-.9c-.6-.2-.6-.6.1-.9l11.7-4.5c.5-.2 1 .1.8.6z"/></svg></span>
+              </a>
+            </div>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary><span class="faq-num">VII</span><span class="faq-q">К кому обращаться 29 и 30 мая?</span></summary>
+          <div class="faq-content">
+            <p>29 и 30 мая можно обращаться к <strong>Софии</strong>:</p>
+            <div class="contact-list">
+              <a class="contact-row" href="tel:+79620171122">
+                <span><span class="ct-name">София</span> · <span class="ct-val">+7 962 017 11 22</span></span>
+                <span class="ct-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+              </a>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-decor">
+        <svg width="60" height="14" viewBox="0 0 60 14"><circle cx="10" cy="7" r="2.2" fill="currentColor" opacity="0.6"/><circle cx="30" cy="7" r="2.6" fill="currentColor"/><circle cx="50" cy="7" r="2.2" fill="currentColor" opacity="0.6"/></svg>
+      </div>
+      <div class="footer-text">С любовью,</div>
+      <div class="footer-names">Глеб и София</div>
+    </footer>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.day-tab');
+    const days = document.querySelectorAll('.day');
+    const themeColors = { '0': '#ece9f0', '1': '#f5ede0', '2': '#e8f1f5', '3': '#fff5e6', '4': '#eaf3ed' };
+    function selectDay(d) {
+      document.body.className = 'theme-' + d;
+      document.documentElement.style.backgroundColor = themeColors[d];
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.day === d));
+      days.forEach(s => s.classList.toggle('active', s.dataset.day === d));
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', themeColors[d]);
+      // Resize bg-layer to cover full document height
+      requestAnimationFrame(resizeBgLayer);
+    }
+    function resizeBgLayer() {
+      const bg = document.getElementById('bgLayer');
+      if (!bg) return;
+      bg.style.height = Math.max(document.documentElement.scrollHeight, window.innerHeight) + 'px';
+    }
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        selectDay(tab.dataset.day);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+    window.addEventListener('load', resizeBgLayer);
+    window.addEventListener('resize', resizeBgLayer);
+    resizeBgLayer();
+
+    // Copy-to-clipboard
+    document.querySelectorAll('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const text = btn.dataset.copy;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          // Fallback for older browsers
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (_) {}
+          document.body.removeChild(ta);
+        }
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1600);
+      });
+    });
+  </script>
+</body>
+</html>
